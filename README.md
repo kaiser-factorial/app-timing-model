@@ -8,7 +8,7 @@ Defaults to my own situation as a May 2026 grad student targeting ML/AI research
 
 The standard advice is high-volume, early, cast a wide net. I'm not doing that — I have the skills for a straightforward data science role but I'm targeting research positions instead, which means I need to convince people doing top-level work that I'm worth betting on as a fast learner. That's a different optimization problem.
 
-A note on where I'm starting from: my master's is in mathematical sciences, so my background until this year has been almost entirely pure math — analysis, linear algebra, that kind of thing. I've been following AI research conceptually for years, but the applied side (data science coursework, real ML projects) is genuinely recent. The preparedness curve reflects that: a high mathematical foundation, but applied ML fluency that's still compounding.
+A note on where I'm starting from: my master's is in mathematical sciences, so my background until this year has been almost entirely pure math — analysis, linear algebra, that kind of thing. I've been following AI research conceptually for years, but the applied side (data science coursework, real ML projects) is quite recent. The preparedness curve reflects that: a high mathematical foundation, but applied ML fluency that's still compounding.
 
 So I modeled it. The tradeoff looks like a classic bias-variance curve: applying too early = high bias (weak application), applying too late = high variance (running out of runway). Somewhere in the middle is a combined score that peaks at an optimal window — but that window shifts once you factor in the negative impact of finals-season stress on application quality.
 
