@@ -48,7 +48,7 @@ There's a reset button to return to my defaults at any time.
 
 ## Built With
 
-Vanilla HTML/CSS/JS + [Chart.js](https://www.chartjs.org/). No framework, no build step.
+Vanilla HTML/CSS/JS + [Chart.js](https://www.chartjs.org/).
 ---
 
 *Part of a broader job search that is, perhaps inadvisably, quality over quantity.*
