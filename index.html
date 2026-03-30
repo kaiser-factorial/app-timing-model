@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>when to apply — job timing tradeoff</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0c0c14;--surface:#14141e;--surface2:#1c1c28;
+  --border:#2a2a3c;--border2:#3a3a50;
+  --text:#ddddf0;--text2:#8888a8;--text3:#55556a;
+  --teal:#2dcfa0;--coral:#f07258;--purple:#a392f0;--pink:#e864a0;--amber:#f5be50;
+}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font-weight:400;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+.card{width:100%;max-width:760px;background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.header{padding:2rem 2rem 1.5rem;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:radial-gradient(circle,rgba(163,146,240,.12) 0%,transparent 70%);pointer-events:none}
+.eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--purple);margin-bottom:.6rem}
+.title{font-family:'DM Serif Display',serif;font-size:clamp(1.4rem,4vw,2rem);line-height:1.15;color:var(--text);margin-bottom:.5rem}
+.title em{font-style:italic;color:var(--purple)}
+.subtitle{font-size:13px;color:var(--text2);line-height:1.5;max-width:520px}
+.subtitle a{color:var(--purple);text-decoration:none}
+.subtitle a:hover{text-decoration:underline}
+.milestones{display:flex;gap:1rem;padding:.9rem 2rem;background:var(--surface2);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.ms{display:flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:10px;color:var(--text2)}
+.chart-area{padding:1.5rem 2rem 1rem}
+.legend{display:flex;flex-direction:column;gap:6px;margin-bottom:1rem}
+.leg-row{display:flex;gap:1.2rem;flex-wrap:wrap;align-items:center}
+.leg{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);font-family:'DM Mono',monospace}
+.leg-line{width:20px;height:2px;border-radius:2px;flex-shrink:0}
+.leg-line.dashed{background:none;border-bottom:2px dashed;height:0;margin-bottom:1px}
+.leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.chart-wrap{position:relative;width:100%;height:260px}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:1rem;padding:1rem 2rem;border-top:1px solid var(--border)}
+.ctrl{display:flex;flex-direction:column;gap:6px}
+.ctrl-header{display:flex;justify-content:space-between;align-items:baseline}
+.ctrl-label{font-size:11px;color:var(--text2);font-family:'DM Mono',monospace;letter-spacing:.04em}
+.ctrl-val{font-size:11px;font-family:'DM Mono',monospace;font-weight:500;color:var(--purple);background:rgba(163,146,240,.1);padding:1px 8px;border-radius:3px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:3px;background:var(--border2);border-radius:2px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--purple);border:2px solid var(--surface);cursor:pointer}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--purple);border:2px solid var(--surface);cursor:pointer}
+.insight{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--border)}
+.ins-cell{padding:1rem 1.25rem;border-right:1px solid var(--border)}
+.ins-cell:last-child{border-right:none}
+.ins-label{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);text-transform:uppercase;margin-bottom:4px}
+.ins-val{font-family:'DM Serif Display',serif;font-size:1.1rem;line-height:1.2}
+.ins-note{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:5px;line-height:1.5}
+.adapt-bar{display:flex;align-items:center;justify-content:space-between;padding:.9rem 2rem;border-top:1px solid rgba(163,146,240,.35);border-bottom:1px solid var(--border);cursor:pointer;user-select:none;transition:background .15s,border-color .15s;background:rgba(163,146,240,.06)}
+.adapt-bar:hover{background:rgba(163,146,240,.11);border-top-color:rgba(163,146,240,.6)}
+.adapt-bar-label{font-family:'DM Mono',monospace;font-size:12px;color:var(--text);letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+.adapt-bar-label::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--purple);display:inline-block;flex-shrink:0}
+.adapt-panel{padding:1.25rem 2rem;background:var(--surface2)}
+.adapt-section{margin-bottom:1.25rem}
+.adapt-section:last-of-type{margin-bottom:0}
+.adapt-section-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:.6rem}
+.date-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.date-row{display:flex;flex-direction:column;gap:4px}
+.date-row label{font-size:10px;color:var(--text2);font-family:'DM Mono',monospace}
+input[type=date],input.proj-name{background:var(--surface);color:var(--text);border:.5px solid var(--border2);border-radius:4px;padding:5px 8px;font-family:'DM Mono',monospace;font-size:11px;outline:none;width:100%}
+input[type=date]:focus,input.proj-name:focus{border-color:var(--purple)}
+input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.5) sepia(1) hue-rotate(200deg);cursor:pointer}
+.project-row{display:grid;grid-template-columns:1fr 130px 110px 20px;gap:6px;align-items:center;margin-bottom:6px}
+select.proj-bump{background:var(--surface);color:var(--text2);border:.5px solid var(--border2);border-radius:4px;padding:5px 4px;font-family:'DM Mono',monospace;font-size:10px;outline:none;cursor:pointer;width:100%}
+.proj-remove{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:0;line-height:1;transition:color .15s}
+.proj-remove:hover{color:var(--coral)}
+.add-proj-btn{background:none;border:.5px solid var(--border2);color:var(--text2);border-radius:4px;padding:5px 12px;font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;margin-top:4px;transition:border-color .15s,color .15s}
+.add-proj-btn:hover{border-color:var(--purple);color:var(--purple)}
+.add-proj-btn:disabled{opacity:.4;cursor:default}
+.reset-btn{background:none;border:.5px solid var(--border2);color:var(--text3);border-radius:4px;padding:6px 14px;font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;margin-top:.75rem;transition:border-color .15s,color .15s}
+.reset-btn:hover{border-color:var(--text2);color:var(--text2)}
+.footer{padding:.7rem 2rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.footer-note{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace}
+.footer-tag{font-size:10px;font-family:'DM Mono',monospace;color:var(--text3)}
+@media(max-width:480px){
+  .header,.chart-area,.controls,.footer,.adapt-bar,.adapt-panel,.milestones{padding-left:1.25rem;padding-right:1.25rem}
+  .controls,.date-grid{grid-template-columns:1fr}
+  .insight{grid-template-columns:1fr}
+  .ins-cell{border-right:none;border-bottom:1px solid var(--border)}
+  .ins-cell:last-child{border-bottom:none}
+  .project-row{grid-template-columns:1fr 100px 20px;grid-template-rows:auto auto}
+  .proj-bump{grid-column:1/3}
+}
+</style>
+</head>
+<body>
+<div class="card">
+
+  <div class="header">
+    <div class="eyebrow">job search · timing model</div>
+    <h1 class="title">When to Apply — A <em>Bias–Variance</em> Tradeoff</h1>
+    <p class="subtitle">Preparedness vs. timeliness, stress-adjusted for the finals crunch. Defaults to my own situation as a May 2026 grad — <a href="#" onclick="toggleAdapt();return false;">adapt it to yours ↓</a></p>
+  </div>
+
+  <div class="milestones" id="milestones-bar"></div>
+
+  <div class="chart-area">
+    <div class="legend">
+      <div class="leg-row">
+        <div class="leg"><div class="leg-line" style="background:#2dcfa0"></div>preparedness</div>
+        <div class="leg"><div class="leg-line" style="background:#f07258"></div>timeliness</div>
+        <div class="leg"><div class="leg-line" style="background:#a392f0"></div>combined</div>
+        <div class="leg"><div class="leg-line dashed" style="border-color:#e864a0"></div>effective (stress-adj.)</div>
+      </div>
+      <div class="leg-row">
+        <div class="leg"><div class="leg-dot" style="background:#a392f0"></div>raw optimal</div>
+        <div class="leg"><div class="leg-dot" style="background:#e864a0"></div>stress-adj. optimal</div>
+      </div>
+    </div>
+    <div class="chart-wrap"><canvas id="chart"></canvas></div>
+  </div>
+
+  <div class="controls">
+    <div class="ctrl">
+      <div class="ctrl-header">
+        <span class="ctrl-label">growth rate</span>
+        <span class="ctrl-val" id="lr-val">moderate</span>
+      </div>
+      <input type="range" id="lr" min="0.4" max="3.2" step="0.1" value="1.6">
+      <div style="display:flex;justify-content:space-between;margin-top:2px">
+        <span style="font-size:9px;color:var(--text3);font-family:'DM Mono',monospace">slow</span>
+        <span style="font-size:9px;color:var(--text3);font-family:'DM Mono',monospace">rapid</span>
+      </div>
+    </div>
+    <div class="ctrl">
+      <div class="ctrl-header">
+        <span class="ctrl-label">finals intensity</span>
+        <span class="ctrl-val" id="st-val">moderate</span>
+      </div>
+      <input type="range" id="st" min="0.05" max="0.55" step="0.05" value="0.25">
+      <div style="display:flex;justify-content:space-between;margin-top:2px">
+        <span style="font-size:9px;color:var(--text3);font-family:'DM Mono',monospace">minor dip</span>
+        <span style="font-size:9px;color:var(--text3);font-family:'DM Mono',monospace">full crunch</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight">
+    <div class="ins-cell">
+      <div class="ins-label">raw optimal</div>
+      <div class="ins-val" id="raw-opt" style="color:var(--purple)">—</div>
+    </div>
+    <div class="ins-cell">
+      <div class="ins-label">stress-adjusted</div>
+      <div class="ins-val" id="eff-opt" style="color:var(--pink)">—</div>
+    </div>
+    <div class="ins-cell">
+      <div class="ins-label">peak stress penalty</div>
+      <div class="ins-val" id="penalty" style="color:var(--coral)">—</div>
+      <div class="ins-note">max reduction to effective application quality at the worst point of the finals window — e.g. if raw combined score is 72% at peak crunch and penalty is −25%, your effective score is ~54%</div>
+    </div>
+  </div>
+
+  <div class="adapt-bar" onclick="toggleAdapt()">
+    <span class="adapt-bar-label">adapt to your situation</span>
+    <span id="adapt-arrow" style="color:var(--purple);font-size:13px;display:inline-block;transition:transform .2s">▾</span>
+  </div>
+
+  <div id="adapt-panel" class="adapt-panel" style="display:none">
+    <div class="adapt-section">
+      <div class="adapt-section-label">key dates</div>
+      <div class="date-grid">
+        <div class="date-row">
+          <label>start date (today)</label>
+          <input type="date" id="c-start" value="2026-03-29" onchange="onConfigChange()">
+        </div>
+        <div class="date-row">
+          <label>classes end</label>
+          <input type="date" id="c-classes" value="2026-05-07" onchange="onConfigChange()">
+        </div>
+        <div class="date-row">
+          <label>graduation</label>
+          <input type="date" id="c-grad" value="2026-05-14" onchange="onConfigChange()">
+        </div>
+        <div class="date-row">
+          <label>financial deadline</label>
+          <input type="date" id="c-ins" value="2026-08-01" onchange="onConfigChange()">
+          <span style="font-size:9px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:2px">insurance / housing / offer deadline</span>
+        </div>
+      </div>
+    </div>
+    <div class="adapt-section">
+      <div class="adapt-section-label">project milestones <span style="text-transform:none;letter-spacing:0;font-size:9px">(each bumps preparedness)</span></div>
+      <div id="projects-list"></div>
+      <button class="add-proj-btn" id="add-proj-btn" onclick="addProject()">+ add milestone</button>
+    </div>
+    <div class="adapt-section">
+      <div class="adapt-section-label">starting preparedness</div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <input type="range" id="c-startprep" min="0.2" max="0.7" step="0.05" value="0.44" oninput="document.getElementById('c-startprep-out').textContent=Math.round(this.value*100)+'%';onConfigChange()">
+        <span id="c-startprep-out" style="font-size:12px;font-family:'DM Mono',monospace;color:var(--text);min-width:36px">44%</span>
+      </div>
+      <div style="font-size:9px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:5px;line-height:1.5">calibrated against avg strong grad student — not the ideal candidate (that curve never reaches 100%)</div>
+    </div>
+    <button class="reset-btn" onclick="resetToDefaults()">↺ reset to corina's defaults</button>
+  </div>
+
+  <div class="footer">
+    <span class="footer-note">drag sliders · customize dates · built with claude</span>
+    <span class="footer-tag">#MLResearch #AIResearch #DataScience #GradLife</span>
+  </div>
+
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const DEFAULTS={
+  startDate:'2026-03-29',classesEndDate:'2026-05-07',gradDate:'2026-05-14',insDate:'2026-08-01',
+  projects:[{name:'LoRA fine-tuning',date:'2026-04-09',bump:0.055}],startPrep:0.44
+};
+
+function parseDate(s){return new Date(s+'T12:00:00');}
+function dateToInput(d){return d.toISOString().split('T')[0];}
+function fmt(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});}
+function weeksFrom(a,b){return(b-a)/(7*24*3600*1000);}
+
+let config={
+  startDate:parseDate(DEFAULTS.startDate),classesEndDate:parseDate(DEFAULTS.classesEndDate),
+  gradDate:parseDate(DEFAULTS.gradDate),insDate:parseDate(DEFAULTS.insDate),
+  projects:DEFAULTS.projects.map(p=>({...p,date:parseDate(p.date)})),startPrep:DEFAULTS.startPrep
+};
+
+function getN(){return Math.min(32,Math.max(14,Math.ceil(weeksFrom(config.startDate,config.insDate))+2));}
+const sig=(x,s)=>1/(1+Math.exp(-x/s));
+
+function computePrep(t,lr){
+  let v=config.startPrep+(0.97-config.startPrep)*(1-Math.exp(-lr*t/10));
+  for(const p of config.projects) v+=p.bump*sig(t-weeksFrom(config.startDate,p.date),0.6);
+  return Math.min(0.97,v);
+}
+
+function computeTimely(t){
+  const gW=weeksFrom(config.startDate,config.gradDate);
+  const iW=weeksFrom(config.startDate,config.insDate);
+  return Math.max(0.02,0.93*Math.exp(-0.055*t)*(1-0.30*sig(t-gW,2.0))*(1-0.80*sig(t-iW,1.2)));
+}
+
+function computeStress(t){
+  const cW=weeksFrom(config.startDate,config.classesEndDate);
+  const iW=weeksFrom(config.startDate,config.insDate);
+  const finalsOn=sig(t-3.5,0.4);
+  const finalsOff=1-sig(t-cW,0.18);
+  const finals=Math.min(1,finalsOn*finalsOff*1.35);
+  const financial=0.55*sig(t-(iW-7),2.2);
+  return Math.min(1,finals+financial);
+}
+
+function compute(lr,sa){
+  const N=getN(),prep=[],timely=[],combined=[],effective=[];
+  for(let i=0;i<=N;i++){
+    const p=computePrep(i,lr),tm=computeTimely(i),c=0.5*p+0.5*tm,e=c*(1-sa*computeStress(i));
+    prep.push(Math.round(p*1000)/1000);timely.push(Math.round(tm*1000)/1000);
+    combined.push(Math.round(c*1000)/1000);effective.push(Math.round(e*1000)/1000);
+  }
+  return{prep,timely,combined,effective};
+}
+
+function maxIdx(arr){return arr.reduce((bi,v,i)=>v>arr[bi]?i:bi,0);}
+
+function generateLabels(){
+  const N=getN(),map={};
+  const mark=(w,top,bot)=>{const r=Math.round(w);if(r>=0&&r<=N)map[r]=[top,bot];};
+  mark(weeksFrom(config.startDate,config.insDate),'out of runway',fmt(config.insDate));
+  mark(weeksFrom(config.startDate,config.gradDate),'graduation',fmt(config.gradDate));
+  config.projects.forEach(p=>mark(weeksFrom(config.startDate,p.date),(p.name.split(' ')[0]||'proj'),fmt(p.date)));
+  const markedIdxs=Object.keys(map).map(Number);
+  return Array.from({length:N+1},(_,i)=>{
+    if(i===0)return fmt(config.startDate);
+    if(map[i])return map[i];
+    if(i%4===0){
+      if(markedIdxs.some(m=>Math.abs(m-i)<=2))return'';
+      const d=new Date(config.startDate);d.setDate(d.getDate()+i*7);return fmt(d);
+    }
+    return'';
+  });
+}
+
+function renderMilestonesBar(){
+  const items=[
+    ...config.projects.map(p=>({c:'#f5be50',l:p.name+' · '+fmt(p.date)})),
+    {c:'#2dcfa0',l:'classes end · '+fmt(config.classesEndDate)},
+    {c:'#2dcfa0',o:.6,l:'graduation · '+fmt(config.gradDate)},
+    {c:'#f07258',l:'out of runway · '+fmt(config.insDate)},
+    {c:'#e864a0',zone:true,l:'finals crunch zone'}
+  ];
+  document.getElementById('milestones-bar').innerHTML=items.map(it=>{
+    const sw=it.zone
+      ?`<span style="width:12px;height:8px;background:rgba(232,100,160,.18);border:1px solid rgba(232,100,160,.45);border-radius:1px;display:inline-block;flex-shrink:0"></span>`
+      :`<span style="width:2px;height:12px;border-left:2px dashed ${it.c}${it.o?'99':'cc'};display:inline-block;flex-shrink:0"></span>`;
+    return`<div class="ms">${sw}${it.l}</div>`;
+  }).join('');
+}
+
+const finalsPlugin={id:'finals',afterDraw(chart){
+  const{ctx,chartArea:{top,bottom},scales:{x}}=chart;
+  const cW=weeksFrom(config.startDate,config.classesEndDate);
+  const x1=x.getPixelForValue(cW-3.2),x2=x.getPixelForValue(cW);
+  ctx.save();ctx.fillStyle='rgba(232,100,160,.06)';ctx.fillRect(x1,top,x2-x1,bottom-top);ctx.restore();
+  ctx.save();ctx.font='9px DM Mono,monospace';ctx.fillStyle='rgba(232,100,160,.45)';ctx.textAlign='center';
+  ctx.fillText('finals',(x1+x2)/2,top+10);ctx.restore();
+}};
+
+const vlinePlugin={id:'vlines',afterDraw(chart){
+  const{ctx,chartArea:{top,bottom},scales:{x}}=chart;
+  const lines=[
+    ...config.projects.map(p=>({w:weeksFrom(config.startDate,p.date),c:'#f5be5099'})),
+    {w:weeksFrom(config.startDate,config.classesEndDate),c:'#2dcfa066'},
+    {w:weeksFrom(config.startDate,config.gradDate),c:'#2dcfa044'},
+    {w:weeksFrom(config.startDate,config.insDate),c:'#f0725866'}
+  ];
+  lines.forEach(({w,c})=>{
+    const xp=x.getPixelForValue(w);
+    ctx.save();ctx.setLineDash([3,4]);ctx.strokeStyle=c;ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(xp,top);ctx.lineTo(xp,bottom);ctx.stroke();ctx.restore();
+  });
+}};
+
+function makeDatasets(d,rawOpt,effOpt){
+  const N=getN();
+  return[
+    {label:'preparedness',data:d.prep,borderColor:'#2dcfa0',borderWidth:1.8,tension:.4,fill:false,pointRadius:0,order:4},
+    {label:'timeliness',data:d.timely,borderColor:'#f07258',borderWidth:1.8,tension:.4,fill:false,pointRadius:0,order:3},
+    {label:'combined',data:d.combined,borderColor:'#a392f0',borderWidth:2,tension:.4,fill:false,pointRadius:0,order:2},
+    {label:'effective',data:d.effective,borderColor:'#e864a0',borderWidth:2.5,borderDash:[5,3],tension:.4,fill:false,pointRadius:0,order:1},
+    {label:'_rawopt',data:d.combined,borderColor:'transparent',borderWidth:0,tension:.4,fill:false,order:0,
+     pointRadius:Array.from({length:N+1},(_,i)=>i===rawOpt?7:0),
+     pointBackgroundColor:'#a392f0',pointBorderColor:'#14141e',pointBorderWidth:1.5},
+    {label:'_effopt',data:d.effective,borderColor:'transparent',borderWidth:0,tension:.4,fill:false,order:0,
+     pointRadius:Array.from({length:N+1},(_,i)=>i===effOpt?8:0),
+     pointBackgroundColor:'#e864a0',pointBorderColor:'#14141e',pointBorderWidth:2}
+  ];
+}
+
+let chartInst=null;
+
+function buildChart(){
+  const lr=parseFloat(document.getElementById('lr').value);
+  const sa=parseFloat(document.getElementById('st').value);
+  const d=compute(lr,sa);
+  const rawOpt=maxIdx(d.combined),effOpt=maxIdx(d.effective);
+  if(chartInst)chartInst.destroy();
+  const ctx2=document.getElementById('chart').getContext('2d');
+  chartInst=new Chart(ctx2,{
+    type:'line',plugins:[finalsPlugin,vlinePlugin],
+    data:{labels:generateLabels(),datasets:makeDatasets(d,rawOpt,effOpt)},
+    options:{
+      responsive:true,maintainAspectRatio:false,animation:{duration:150},
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          mode:'index',intersect:false,backgroundColor:'#1c1c28',borderColor:'#2a2a3c',borderWidth:1,
+          titleColor:'#ddddf0',bodyColor:'#8888a8',
+          titleFont:{family:'DM Mono,monospace',size:11},bodyFont:{family:'DM Mono,monospace',size:10},
+          filter:item=>!item.dataset.label.startsWith('_'),
+          callbacks:{
+            title:items=>{const i=items[0].dataIndex;const dt=new Date(config.startDate);dt.setDate(dt.getDate()+i*7);return fmt(dt);},
+            label:item=>`${item.dataset.label}: ${Math.round(item.parsed.y*100)}%`
+          }
+        }
+      },
+      scales:{
+        x:{grid:{display:false},border:{color:'#2a2a3c'},
+           ticks:{font:{family:'DM Mono,monospace',size:9.5},color:'#55556a',maxRotation:0,autoSkip:false}},
+        y:{min:0,max:1,grid:{color:'rgba(255,255,255,.04)'},border:{color:'#2a2a3c',dash:[3,3]},
+           ticks:{font:{family:'DM Mono,monospace',size:10},color:'#55556a',stepSize:.25,callback:v=>`${Math.round(v*100)}%`}}
+      }
+    }
+  });
+  updateBanners(d,rawOpt,effOpt,sa);
+}
+
+function updateBanners(d,rawOpt,effOpt,sa){
+  const toDate=i=>{const dt=new Date(config.startDate);dt.setDate(dt.getDate()+i*7);return dt;};
+  document.getElementById('raw-opt').textContent=fmt(toDate(rawOpt));
+  document.getElementById('eff-opt').textContent=fmt(toDate(effOpt));
+  const N=getN();
+  const maxS=Math.max(...Array.from({length:N+1},(_,i)=>computeStress(i)));
+  document.getElementById('penalty').textContent=`\u2212${Math.round(sa*maxS*100)}% at peak`;
+}
+
+function lrLabel(v){return v<0.9?'slow':v<1.5?'moderate':v<2.3?'fast':'rapid';}
+function stLabel(v){return v<0.12?'minor dip':v<0.28?'moderate':v<0.42?'heavy crunch':'full crunch';}
+
+function updateSliders(){
+  const lr=parseFloat(document.getElementById('lr').value);
+  const sa=parseFloat(document.getElementById('st').value);
+  document.getElementById('lr-val').textContent=lrLabel(lr);
+  document.getElementById('st-val').textContent=stLabel(sa);
+  const d=compute(lr,sa);
+  const rawOpt=maxIdx(d.combined),effOpt=maxIdx(d.effective);
+  chartInst.data.datasets=makeDatasets(d,rawOpt,effOpt);
+  chartInst.update();
+  updateBanners(d,rawOpt,effOpt,sa);
+}
+
+document.getElementById('lr').addEventListener('input',updateSliders);
+document.getElementById('st').addEventListener('input',updateSliders);
+
+let adaptOpen=false;
+function toggleAdapt(){
+  adaptOpen=!adaptOpen;
+  document.getElementById('adapt-panel').style.display=adaptOpen?'block':'none';
+  document.getElementById('adapt-arrow').style.transform=adaptOpen?'rotate(180deg)':'';
+  if(adaptOpen)setTimeout(()=>document.getElementById('adapt-panel').scrollIntoView({behavior:'smooth',block:'start'}),50);
+}
+
+function renderProjects(){
+  const list=document.getElementById('projects-list');
+  list.innerHTML='';
+  config.projects.forEach((proj,idx)=>{
+    const row=document.createElement('div');
+    row.className='project-row';
+    row.innerHTML=
+      `<input type="text" class="proj-name" value="${proj.name}" placeholder="project name" oninput="config.projects[${idx}].name=this.value">` +
+      `<input type="date" value="${dateToInput(proj.date)}" style="background:var(--surface);color:var(--text);border:.5px solid var(--border2);border-radius:4px;padding:5px 6px;font-family:'DM Mono',monospace;font-size:11px;outline:none" onchange="config.projects[${idx}].date=parseDate(this.value);buildChart()">` +
+      `<select class="proj-bump" onchange="config.projects[${idx}].bump=parseFloat(this.value);buildChart()">` +
+        `<option value="0.03"${proj.bump===0.03?' selected':''}>small (+3%)</option>` +
+        `<option value="0.055"${proj.bump===0.055?' selected':''}>medium (+5%)</option>` +
+        `<option value="0.09"${proj.bump===0.09?' selected':''}>large (+9%)</option>` +
+      `</select>` +
+      (config.projects.length>1?`<button class="proj-remove" onclick="config.projects.splice(${idx},1);renderProjects();buildChart()">×</button>`:'<span></span>');
+    list.appendChild(row);
+  });
+  document.getElementById('add-proj-btn').disabled=config.projects.length>=5;
+}
+
+function addProject(){
+  if(config.projects.length>=5)return;
+  const d=new Date(config.startDate);d.setDate(d.getDate()+21);
+  config.projects.push({name:'',date:d,bump:0.055});
+  renderProjects();buildChart();
+}
+
+function onConfigChange(){
+  config.startDate=parseDate(document.getElementById('c-start').value);
+  config.classesEndDate=parseDate(document.getElementById('c-classes').value);
+  config.gradDate=parseDate(document.getElementById('c-grad').value);
+  config.insDate=parseDate(document.getElementById('c-ins').value);
+  config.startPrep=parseFloat(document.getElementById('c-startprep').value);
+  renderMilestonesBar();buildChart();
+}
+
+function resetToDefaults(){
+  config.startDate=parseDate(DEFAULTS.startDate);
+  config.classesEndDate=parseDate(DEFAULTS.classesEndDate);
+  config.gradDate=parseDate(DEFAULTS.gradDate);
+  config.insDate=parseDate(DEFAULTS.insDate);
+  config.projects=DEFAULTS.projects.map(p=>({...p,date:parseDate(p.date)}));
+  config.startPrep=DEFAULTS.startPrep;
+  document.getElementById('c-start').value=DEFAULTS.startDate;
+  document.getElementById('c-classes').value=DEFAULTS.classesEndDate;
+  document.getElementById('c-grad').value=DEFAULTS.gradDate;
+  document.getElementById('c-ins').value=DEFAULTS.insDate;
+  document.getElementById('c-startprep').value=DEFAULTS.startPrep;
+  document.getElementById('c-startprep-out').textContent=Math.round(DEFAULTS.startPrep*100)+'%';
+  renderProjects();renderMilestonesBar();buildChart();
+}
+
+renderProjects();
+renderMilestonesBar();
+buildChart();
+</script>
+</body>
+</html>
