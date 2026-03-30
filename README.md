@@ -1,4 +1,4 @@
-# When to Apply — A Bias–Variance Tradeoff
+# When to Apply: A Bias–Variance Tradeoff
 
 An interactive timing model for job applications, built around the tension between **preparedness** (am I actually ready?) and **timeliness** (do I still have runway?), stress-adjusted for the finals crunch.
 
