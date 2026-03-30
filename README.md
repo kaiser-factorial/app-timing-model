@@ -6,7 +6,7 @@ Defaults to my own situation as a May 2026 grad student targeting ML/AI research
 
 ## The Idea
 
-The standard advice is high-volume, early, cast a wide net. I'm not doing that — I have the skills for a straightforward data science role but I'm targeting research positions instead, which means I need to convince people doing genuinely top-level work that I'm worth betting on as a fast learner. That's a different optimization problem.
+The standard advice is high-volume, early, cast a wide net. I'm not doing that — I have the skills for a straightforward data science role but I'm targeting research positions instead, which means I need to convince people doing top-level work that I'm worth betting on as a fast learner. That's a different optimization problem.
 
 A note on where I'm starting from: my master's is in mathematical sciences, so my background until this year has been almost entirely pure math — analysis, linear algebra, that kind of thing. I've been following AI research conceptually for years, but the applied side (data science coursework, real ML projects) is genuinely recent. The preparedness curve reflects that: a high mathematical foundation, but applied ML fluency that's still compounding.
 
