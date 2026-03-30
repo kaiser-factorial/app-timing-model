@@ -48,8 +48,7 @@ There's a reset button to return to my defaults at any time.
 
 ## Built With
 
-Vanilla HTML/CSS/JS + [Chart.js](https://www.chartjs.org/). No framework, no build step. Rename to `index.html` for GitHub Pages, or just open the file directly in a browser.
-
+Vanilla HTML/CSS/JS + [Chart.js](https://www.chartjs.org/). No framework, no build step.
 ---
 
 *Part of a broader job search that is, perhaps inadvisably, quality over quantity.*
